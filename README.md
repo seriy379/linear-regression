@@ -4,4 +4,4 @@
 
 `parcel index.html`
 
-Open in your brawser http://localhost:1234 
+Open in your browser http://localhost:1234 
