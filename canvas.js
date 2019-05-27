@@ -51,13 +51,14 @@ function itteration(step, color) {
 	min = Infinity;
 	minK = Infinity;
 	minB = Infinity;
+	minI = undefined;
 
 
 	for (let i = 0; i < count; i += 1) {
 		stdY += xy[1][i];
 	}
 
-	while (mse > (stdY / 100) && itter < 10000) {
+	while (Math.sqrt(mse) > (stdY / 100) && itter < 10000) {
 		mse = 0;
 		for (let i = 0; i < count; i += 1) {
 			gradK += ((k * xy[0][i]) + b - xy[1][i]) * xy[0][i];
@@ -69,10 +70,11 @@ function itteration(step, color) {
 		itter += 1;
 	
 		for (let i = 0; i < count; i += 1) {
-			mse += ((k * xy[0][i]) + b - xy[1][i]) * ((k * xy[0][i]) + b - xy[1][i]);
+			mse += ((k * xy[0][i]) + b - xy[1][i]) * ((k * xy[0][i]) + b - xy[1][i]) / count;
 		}
-		mse /= count;
-		if (Math.sqrt((currentMSE - mse) * (currentMSE - mse)) < 0.00001) {
+		// mse /= count;
+		if (Math.sqrt((currentMSE - mse) * (currentMSE - mse)) < 0.01) {
+
 			console.log(currentMSE, mse);
 			return;
 		}
@@ -82,8 +84,10 @@ function itteration(step, color) {
 			min = mse;
 			minK = k;
 			minB = b;
+			minI = itter;
 		}
 
+		document.getElementById('itter').innerHTML = minI;
 		document.getElementById('i').innerHTML = itter;
 		document.getElementById('k').innerHTML = k;
 		document.getElementById('b').innerHTML = b;
@@ -93,7 +97,7 @@ function itteration(step, color) {
 		document.getElementById('bmin').innerHTML = minB;
 		document.getElementById('step').innerHTML = step;
 
-		if (mse <= (stdY / 100) || itter == 10000) {
+		if (Math.sqrt((currentMSE - mse) * (currentMSE - mse)) < 0.0001 || itter == 10000) {
 			context.beginPath();
 			let x = 0;
 			let y = (minK * x ) + minB;
@@ -113,8 +117,6 @@ function line() {
 	let avgX = 0;
 	let avgY = 0;
 	let avgX2 = 0;
-	let dispersX = 0;
-	let dispersY = 0;
 	let avgXY = 0;
 
 	for (let i = 0; i < count; i += 1) {
@@ -122,11 +124,6 @@ function line() {
 		avgY += xy[1][i] / count;
 		avgXY += xy[0][i] * xy[1][i] / count;
 		avgX2 += xy[0][i] * xy[0][i] / count;
-	}
-
-	for (let i = 0; i < count; i += 1) {
-			dispersX += (xy[0][i] - avgX) * (xy[0][i] - avgX) / count;
-			dispersY += (xy[1][i] - avgY) * (xy[1][i] - avgY) / count;
 	}
 
 	const k = ( (avgX * avgY) - avgXY ) / ( (avgX * avgX) - avgX2 );
